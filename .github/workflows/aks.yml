@@ -1,0 +1,63 @@
+name: "Construct AKS"
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    working-directory: terraform/azure/aks
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform/azure/aks
+
+    env:
+      ARM_SUBSCRIPTION_ID: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
+      ARM_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
+      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+      ARM_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}
+      TF_VAR_SUBSCRIPTION_ID: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
+      TF_VAR_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
+      TF_VAR_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+      TF_VAR_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}
+      TF_VAR_RESOURCE_GROUP_NAME: "aks-test"
+      TF_VAR_LOCATION: "East US"
+      TF_VAR_CLUSTER_NAME: "test-aks-cluster"
+      TF_VAR_DNS_PREFIX: "kubecluster"
+      TF_VAR_DEFAULT_NODE_POOL_NAME: "default"
+      TF_VAR_ENABLE_AUTO_SCALING: false
+      TF_VAR_VM_SIZE: "Standard_D2_v2"
+      TF_VAR_NODE_COUNT: "1"
+      BC_RESOURCE_GROUP_NAME: "k8s-test"
+      BC_STORAGE_ACCOUNT_NAME: "lethe2211k8s"
+      BC_CONTAINER_NAME: "aks-state"
+      BC_KEY: "prod.terraform.tfstate"
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init --backend-config resource_group_name=${BC_RESOURCE_GROUP_NAME} --backend-config storage_account_name=${BC_STORAGE_ACCOUNT_NAME} --backend-config container_name=${BC_CONTAINER_NAME} --backend-config key=${BC_KEY}
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan
+
+    # Build or change infrastructure according to Terraform configuration files
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
