@@ -37,13 +37,13 @@ jobs:
       BC_key: "prod.terraform.tfstate"
 
     steps:
-    # Display environmental variables for debugging
-    - name: Display env vars
-      run: env
-
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
+
+    # Display environmental variables for debugging
+    - name: Display env vars
+      run: env
 
     # Install the latest version of Terraform CLI
     - name: Setup Terraform
