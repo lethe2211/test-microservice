@@ -1,11 +1,11 @@
-name: "Construct AKS"
+name: "Construct an AKS cluster"
 
 on:
   workflow_dispatch: {}
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Construct a AKS cluster with Terraform'
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
@@ -19,24 +19,28 @@ jobs:
       ARM_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
       ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
       ARM_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}
-      TF_VAR_SUBSCRIPTION_ID: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
-      TF_VAR_CLIENT_ID: ${{secrets.TF_ARM_CLIENT_ID}}
-      TF_VAR_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-      TF_VAR_TENANT_ID: ${{secrets.TF_ARM_TENANT_ID}}
-      TF_VAR_RESOURCE_GROUP_NAME: "aks-test"
-      TF_VAR_LOCATION: "East US"
-      TF_VAR_CLUSTER_NAME: "test-aks-cluster"
-      TF_VAR_DNS_PREFIX: "kubecluster"
-      TF_VAR_DEFAULT_NODE_POOL_NAME: "default"
-      TF_VAR_ENABLE_AUTO_SCALING: false
-      TF_VAR_VM_SIZE: "Standard_D2_v2"
-      TF_VAR_NODE_COUNT: "1"
-      BC_RESOURCE_GROUP_NAME: "k8s-test"
-      BC_STORAGE_ACCOUNT_NAME: "lethe2211k8s"
-      BC_CONTAINER_NAME: "aks-state"
-      BC_KEY: "prod.terraform.tfstate"
+      TF_VAR_subscription_id: ${{secrets.TF_ARM_SUBSCRIPTION_ID}}
+      TF_VAR_client_id: ${{secrets.TF_ARM_CLIENT_ID}}
+      TF_VAR_client_secret: ${{secrets.TF_ARM_CLIENT_SECRET}}
+      TF_VAR_tenant_id: ${{secrets.TF_ARM_TENANT_ID}}
+      TF_VAR_resource_group_name: "aks-test"
+      TF_VAR_location: "East US"
+      TF_VAR_cluster_name: "test-aks-cluster"
+      TF_VAR_dns_prefix: "kubecluster"
+      TF_VAR_default_node_pool_name: "default"
+      TF_VAR_enable_auto_scaling: false
+      TF_VAR_vm_size: "Standard_D2_v2"
+      TF_VAR_node_count: "1"
+      BC_resource_group_name: "k8s-test"
+      BC_storage_account_name: "lethe2211k8s"
+      BC_container_name: "aks-state"
+      BC_key: "prod.terraform.tfstate"
 
     steps:
+    # Display environmental variables for debugging
+    - name: Display env vars
+      run: env
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
@@ -47,7 +51,7 @@ jobs:
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: terraform init --backend-config resource_group_name=${BC_RESOURCE_GROUP_NAME} --backend-config storage_account_name=${BC_STORAGE_ACCOUNT_NAME} --backend-config container_name=${BC_CONTAINER_NAME} --backend-config key=${BC_KEY}
+      run: terraform init --backend-config resource_group_name=${BC_resource_group_name} --backend-config storage_account_name=${BC_storage_account_name} --backend-config container_name=${BC_container_name} --backend-config key=${BC_key}
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format

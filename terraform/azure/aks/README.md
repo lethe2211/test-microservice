@@ -67,7 +67,7 @@
         resource_group_name    = "${resource_group_name}"
         location               = "${location}"
         cluster_name           = "${cluster_name}"
-        dns_preffix            = "${dns_preffix}"
+        dns_prefix             = "${dns_prefix}"
         default_node_pool_name = "${default_node_pool_name}"
         enable_auto_scaling    = "${enable_auto_scaling}"
         vm_size                = "${vm_size}"
