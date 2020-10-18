@@ -57,6 +57,6 @@ jobs:
     - name: Terraform Format
       run: terraform fmt -check
 
-    # Destory infrastructure according to Terraform configuration files
-    - name: Terraform Destory
-      run: terraform destory -auto-approve
+    # Destroy infrastructure according to Terraform configuration files
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
