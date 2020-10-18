@@ -33,7 +33,7 @@ variable "cluster_name" {
   description = "Name of Azure Kubernetes Cluster"
 }
 
-variable "dns_preffix" {
+variable "dns_prefix" {
   type        = string
   description = "DNS prefix for the managed cluster"
 }
