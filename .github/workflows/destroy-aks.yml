@@ -37,13 +37,13 @@ jobs:
       BC_key: "prod.terraform.tfstate"
 
     steps:
-    # Display environmental variables for debugging
-    - name: Display env vars
-      run: env
-
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
+
+    # Display environmental variables for debugging
+    - name: Display env vars
+      run: env
 
     # Install the latest version of Terraform CLI
     - name: Setup Terraform
@@ -57,6 +57,6 @@ jobs:
     - name: Terraform Format
       run: terraform fmt -check
 
-    # Destory infrastructure according to Terraform configuration files
-    - name: Terraform Destory
-      run: terraform destory -auto-approve
+    # Destroy infrastructure according to Terraform configuration files
+    - name: Terraform Destroy
+      run: terraform destroy -auto-approve
