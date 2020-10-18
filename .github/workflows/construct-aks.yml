@@ -1,11 +1,11 @@
-name: "Construct AKS"
+name: "Construct an AKS cluster"
 
 on:
   workflow_dispatch: {}
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'Construct a AKS cluster with Terraform'
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
@@ -37,6 +37,10 @@ jobs:
       BC_key: "prod.terraform.tfstate"
 
     steps:
+    # Display environmental variables for debugging
+    - name: Display env vars
+      run: env
+
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
@@ -48,9 +52,6 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: terraform init --backend-config resource_group_name=${BC_resource_group_name} --backend-config storage_account_name=${BC_storage_account_name} --backend-config container_name=${BC_container_name} --backend-config key=${BC_key}
-
-    - name: Display env
-      run: env
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
