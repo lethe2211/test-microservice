@@ -72,3 +72,8 @@ variable "nic_ip_configuration_name" {
   type        = string
   description = "IP configuration name of Azure Network Interface"
 }
+
+variable "vm_prefix" {
+  type        = string
+  description = "Prefix of Azure VM name. Please add it to the beginning of azurerm_linux_virtual_machine tf script"
+}

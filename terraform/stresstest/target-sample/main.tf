@@ -1,5 +1,12 @@
 terraform {
-  required_version = ">=0.12.0"
+  required_version = "=0.15.1"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.46.0"
+    }
+  }
 
   # Save terrafrom states into Azure Storage
   backend "azurerm" {
@@ -7,8 +14,6 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "=2.32.0"
-
   subscription_id = var.subscription_id
   #  client_id       = var.client_id
   #  client_secret   = var.client_secret
@@ -111,16 +116,15 @@ resource "tls_private_key" "ssh" {
   rsa_bits  = 4096
 }
 
-# Virtual Machine
-resource "azurerm_linux_virtual_machine" "test_vm" {
-  name                  = "vm-test"
+# Virtual Machines
+resource "azurerm_linux_virtual_machine" "vm1" {
+  name                  = "${var.vm_prefix}-1"
   location              = var.location
   resource_group_name   = azurerm_resource_group.vm_rg.name
   network_interface_ids = [azurerm_network_interface.nic.id]
   size                  = "Standard_DS1_v2"
-
   os_disk {
-    name                 = "vm-test-os-disk"
+    name                 = "${var.vm_prefix}-1-os-disk"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
@@ -132,7 +136,40 @@ resource "azurerm_linux_virtual_machine" "test_vm" {
     version   = "latest"
   }
 
-  computer_name                   = "vm-test"
+  computer_name                   = "${var.vm_prefix}-1"
+  admin_username                  = "azureuser"
+  disable_password_authentication = true
+
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = tls_private_key.ssh.public_key_openssh
+  }
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.storage_account.primary_blob_endpoint
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "vm2" {
+  name                  = "${var.vm_prefix}-2"
+  location              = var.location
+  resource_group_name   = azurerm_resource_group.vm_rg.name
+  network_interface_ids = [azurerm_network_interface.nic.id]
+  size                  = "Standard_DS1_v2"
+  os_disk {
+    name                 = "${var.vm_prefix}-2-os-disk"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04.0-LTS"
+    version   = "latest"
+  }
+
+  computer_name                   = "${var.vm_prefix}-2"
   admin_username                  = "azureuser"
   disable_password_authentication = true
 
